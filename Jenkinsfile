@@ -9,13 +9,17 @@ pipeline {
     stages {
         stage('Install Dependencies') {
             steps {
-                sh 'pip install -r requirements.txt'
+                echo "📦 Installing dependencies..."
+                sh 'pip install --upgrade pip'
+                sh 'pip install --no-cache-dir -r requirements.txt'
             }
         }
 
         stage('Run Tests') {
             steps {
-                sh 'pytest test_app.py'
+                echo "🧪 Running tests..."
+                // Gunakan python -m pytest agar pasti di environment Python yang benar
+                sh 'python -m pytest test_app.py'
             }
         }
 
@@ -27,7 +31,7 @@ pipeline {
                 }
             }
             steps {
-                echo "Simulating deploy from branch ${env.BRANCH_NAME}"
+                echo "🚀 Simulating deploy from branch ${env.BRANCH_NAME}"
             }
         }
     }
@@ -36,7 +40,7 @@ pipeline {
         success {
             script {
                 def payload = [
-                    content: "✅ Build SUCCESS on `${env.BRANCH_NAME}`\n🔗URL: ${env.BUILD_URL}"
+                    content: "✅ Build SUCCESS on `${env.BRANCH_NAME}`\n🔗 URL: ${env.BUILD_URL}"
                 ]
                 httpRequest(
                     httpMode: 'POST',
@@ -50,7 +54,7 @@ pipeline {
         failure {
             script {
                 def payload = [
-                    content: "❌ Build FAILED on `${env.BRANCH_NAME}`\n🔗URL: ${env.BUILD_URL}"
+                    content: "❌ Build FAILED on `${env.BRANCH_NAME}`\n🔗 URL: ${env.BUILD_URL}"
                 ]
                 httpRequest(
                     httpMode: 'POST',
